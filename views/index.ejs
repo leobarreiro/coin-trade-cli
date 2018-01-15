@@ -18,27 +18,37 @@
 <body>
 
 	<form name="frm" accept="plain/text">
-		<select id="excId" name="exc">
-			<option value="">Exchange...</option>
-			<% 	for (var x = 0; x < excList.length; x++) { %>
-			<option value="<%= excList[x].name %>" <% if (excList[x].name == exchange) { %> selected <% } %> > <%= excList[x].name %></option>
-			<% 	} %>
-		</select>
-		<select id="mktId" name="mkt" disabled="true">
-			<option value="">Mercado...</option>
-			<% 	for (var y = 0; y < mktList.length; y++) { %>
-			<option value="<%= mktList[y].name %>" <% if (mktList[x].name == market) { %> selected <% } %> ><%= mktList[y].name %></option>
-			<% 	} %>
-		</select>
-		<select id="cndlId" name="cndl" disabled="true">
-			<option value="">Intervalo...</option>
-			<option value="MIN10">10 min</option>
-			<option value="MIN30">30 min</option>
-		</select>
+		<table width="100%">
+			<tr>
+				<td width="15%" valign="top" align="center">
+					<img src="images/javaleo-100.112.png" />
+				</td>
+				<td width="85%">
+					<select id="excId" name="exc">
+						<option value="">Exchange...</option>
+						<% 	for (var x = 0; x < excList.length; x++) { %>
+						<option value="<%= excList[x].name %>" <% if (excList[x].name == exchange) { %> selected <% } %> > <%= excList[x].name %></option>
+						<% 	} %>
+					</select>
+					<select id="mktId" name="mkt" disabled="true">
+						<option value="">Mercado...</option>
+						<% 	for (var y = 0; y < mktList.length; y++) { %>
+						<option value="<%= mktList[y].name %>" <% if (mktList[x].name == market) { %> selected <% } %> ><%= mktList[y].name %></option>
+						<% 	} %>
+					</select>
+					<select id="cndlId" name="cndl" disabled="true">
+						<option value="">Intervalo...</option>
+						<option value="MIN10">10 min</option>
+						<option value="MIN30">30 min</option>
+					</select>
+
+					<div id="chartId" style="width:100%;height:400px;"></div>	
+				</td>
+			</tr>
+
+		</table>
+
 	</form>
-
-	<div id="chartId" style="width:100%;height:400px;"></div>
-
 
 </body>
 </html>

@@ -48,7 +48,8 @@ $(document).ready(function() {
 					var i = 1;
 					var min = 0;
 					var max = 0;
-					for (var i=80; i < data.length; i++) {
+					var start = (candle === 'MIN10') ? 60 : 0;
+					for (var i=start; i < data.length; i++) {
 						if (min > data[i].lowest) {
 							min = data[i].lowest;
 						}
