@@ -3,6 +3,144 @@ $(document).ready(function() {
 
 	var seriesPlot = [];
 	var excPlot = null;
+	
+	var formatFiatCurrency = function(num) {
+		return num.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+	}
+	
+	var formatDecimal = function(num) {
+		return num.toLocaleString('pt-BR', {style: 'decimal', minimumIntegerDigits: 1, maximumFractionDigits: 2});
+	}
+	
+	var showSummary = function(mktName, curName, mktCap, mktCur, variation, lowestAsk, highestBid, spread) {
+		$('#summaryId').css('display', 'block').css('visibility', 'visible');
+		$('#sumMktNameId').html("Market " + mktName);
+		$('#sumMktCapId').html(formatFiatCurrency(mktCap));
+		$('#sumCurCapId').html(formatDecimal(mktCur) + ' ' + curName);
+		$('#sumVarId').html(formatDecimal(variation) + '%');
+		if (variation > 0) {
+			$('#sumVarId').css('color', 'green');
+		} else if (variation < 0) {
+			$('#sumVarId').css('color', 'red');
+		} else {
+			$('#sumVarId').css('color', 'black');
+		}
+		$('#sumLowAskId').html(formatFiatCurrency(lowestAsk));
+		$('#sumHighBidId').html(formatFiatCurrency(highestBid));
+		$('#sumSpreadId').html(formatDecimal(spread) + '%');
+		if (spread > 1.5) {
+			$('#sumSpreadId').css('color', 'red');
+		} else {
+			$('#sumSpreadId').css('color', 'gray');
+		}
+		return;
+	}
+	
+	var hideSummary = function() {
+		$('#summaryId').css('display', 'none');
+		return;
+	}
+	
+	var requestCandles = function() {
+		var exchange = $('#excId').val();
+		var market = $('#mktId').val();
+		var candle = $('#cndlId').val();
+		
+		seriesPlot = [];
+		
+		if (exchange.length == 0 || market.length == 0 || candle.length == 0) {
+			return;
+		}
+
+		$.getJSON("/" + exchange + '/' + market + '/' + candle, 
+			function(data) {
+				var i = 1;
+				var min = 0;
+				var max = 0;
+				var cds = data.candles;
+				var start = (candle === 'MIN10') ? (cds.length - 	120) : (cds.length - 30);
+				
+				for (var i=start; i < cds.length; i++) {
+					if (min > cds[i].lowest) {
+						min = cds[i].lowest;
+					}
+					if (max < cds[i].highest) {
+						max = cds[i].highest;
+					}
+					seriesPlot.push([cds[i].collectedTime, cds[i].opening, cds[i].highest, cds[i].lowest, cds[i].closure]);
+				}
+
+				if (excPlot) {
+					hideSummary();
+					excPlot.destroy();
+				}
+
+				$.jqplot.sprintf.thousandsSeparator = '.';
+				
+				excPlot = $.jqplot('chartId', [seriesPlot], 
+				{
+					title: exchange + ' - ' + market + ' (' + candle + ')', 
+					axesDefaults: {
+						tickOptions: {
+							textColor: '#000000', 
+							fontSize: '8pt' 
+						} 
+					}, 
+					axes: {
+						xaxis: {
+							renderer:$.jqplot.DateAxisRenderer, 
+			                rendererOptions:{
+			                    tickRenderer:$.jqplot.CanvasAxisTickRenderer
+			                },
+							tickOptions: {
+								formatter: $.jqplot.DefaultTickFormater, 
+								mark: 'cross', 
+								textAngle: -30, 
+								formatString: '%Hh%M' 
+							} 
+						},
+						yaxis: {
+			                rendererOptions:{
+			                    tickRenderer:$.jqplot.CanvasAxisTickRenderer
+			                }, 
+							tickOptions:{ 
+								prefix: '$ ', 
+								angle: -30, 
+								formatString: "%'i"
+							}, 
+						}
+					}, 
+					seriesDefaults: {
+						renderer:$.jqplot.OHLCRenderer, 
+						rendererOptions:{ 
+							smooth: true, 
+							candleStick:true, 
+							upBodyColor: '#006600', 
+							downBodyColor: '#ff0000', 
+							fillUpBody: true, 
+							lineWidth: 1.2, 
+							color: '#000000'
+						} 
+					}, 
+					highlighter: {
+						show: true,
+						yvalues: 4, 
+						bringSeriesToFront: true, 
+						formatString:'<table class="jqplot-highlighter"><tr><td>time:</td><td>%s</td></tr><tr><td>open:</td><td>%s</td></tr><tr><td>high:</td><td>%s</td></tr><tr><td>low:</td><td>%s</td></tr><tr><td>close:</td><td>%s</td></tr></table>'
+					}, 
+					cursor: {
+					      show: true,
+					      tooltipLocation:'sw'
+					    }
+		    	});
+				
+				// mktName, mktCap, mktCur, variation, lowestAsk, highestBid, spread
+				showSummary(data.market.name, data.market.changeCoin.name.symbol, data.lastTicker.marketCap, data.lastTicker.currencyVolume, data.lastTicker.percentChange, data.lastTicker.lowestAsk, data.lastTicker.highestBid, data.lastTicker.spread);
+
+			}
+		);
+		return;
+	}
 
 	$('#excId').change(function() {
 		var exchange = $(this).val();
@@ -24,92 +162,35 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#mktId').change( function() {
-		$('#cndlId').val("");
+	$('#mktId').change(function() {
+		// $('#cndlId').val("");
 		var exchange = $('#excId').val();
 		var market = $(this).val();
 		if (exchange.length == 0 || market.length == 0) {
 			$('#cndlId').prop("disabled", true);
 		} else {
 			$('#cndlId').prop("disabled", false);
+			if ($('#cndlId').val().length > 0) {
+				requestCandles();
+			}
 		}
 	});
 
-	$('#cndlId').change(function() {
-		var exchange = $('#excId').val();
-		var market = $('#mktId').val();
-		var candle = $(this).val();
-		$('#chartId').empty();
-		seriesPlot = [];
-
-		if (exchange.length > 0 && market.length > 0 && candle.length > 0) {
-			$.getJSON("/" + exchange + '/' + market + '/' + candle, 
-				function(data) {
-					var i = 1;
-					var min = 0;
-					var max = 0;
-					var start = (candle === 'MIN10') ? 60 : 0;
-					for (var i=start; i < data.length; i++) {
-						if (min > data[i].lowest) {
-							min = data[i].lowest;
-						}
-						if (max < data[i].highest) {
-							max = data[i].highest;
-						}
-						seriesPlot.push([data[i].collectedTime, data[i].opening, data[i].highest, data[i].lowest, data[i].closure]);
-					}
-
-					if (excPlot) {
-						excPlot.destroy();
-					}
-
-					excPlot = $.jqplot('chartId', [seriesPlot], 
-					{
-						title: exchange + ' - ' + market + ' (' + candle + ')', 
-						axesDefaults: {
-						},
-						axes: {
-							xaxis: {
-								renderer:$.jqplot.DateAxisRenderer, 
-								tickOptions: {
-									angle: -30
-								}, 
-								numberTicks: 20
-							},
-								yaxis: {
-								tickOptions:{ prefix: '$', angle: -30 }, 
-							}
-						}, 
-				        cursor: {
-        				    zoom: true,
-            				looseZoom: true
-        				}, 
-						seriesDefaults: {
-							rendererOptions: {
-								smooth: true
-							}
-						},
-						series: [{renderer:$.jqplot.OHLCRenderer, rendererOptions:{ candleStick:true }}],
-						cursor:{
-							showTooltip: true
-						},
-						highlighter: {
-							show: true,
-							showMarker:false,
-							tooltipAxes: 'xy',
-							yvalues: 4,
-							formatString:'<table class="jqplot-highlighter"><tr><td>date:</td><td>%s</td></tr><tr><td>open:</td><td>%s</td></tr><tr><td>hi:</td><td>%s</td></tr><tr><td>low:</td><td>%s</td></tr><tr><td>close:</td><td>%s</td></tr></table>'
-						}
-			    	});
-
-				}
-			);
-		}
-	});	
+	$('#cndlId').change(function() {requestCandles();});
 
 	$(document).ajaxError(function( event, jqxhr, settings, thrownError ) {
     	// alert('error: ' + JSON.stringify(settings));
 	});
+	
+	$(document).ajaxStart(function(){
+	    $("#loadingId").css("visibility", "visible");
+	});
 
+	$(document).ajaxComplete(function(){
+	    $("#loadingId").css("visibility", "hidden");
+	});
+
+	var updateMode = setInterval(function(){ requestCandles(); }, 60000);
+	
 });
 

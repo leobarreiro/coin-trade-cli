@@ -2,10 +2,10 @@
 <html lang="pt-br">
 <html>
 <head>
-	<title>Brazilian Cryptocurrencies Exchanges - Candlestick Chart</title>
+	<title>Bitcoin, Ethereum, Dash, Litecoin - Candlestick Chart de Exchanges Brasileiras</title>
 	<meta charset="utf-8">
 	<link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
-	<link rel="stylesheet" type="text/css" href="/stylesheets/jquery.jqplot.min.css" />
+	<link rel="stylesheet" type="text/css" href="/stylesheets/jquery.jqplot.css" />
 	<script type="text/javascript" src="/javascripts/jquery-3.2.1.min.js"></script>
 	<script type="text/javascript" src="/javascripts/jquery.jqplot.min.js"></script>
 	<script type="text/javascript" src="/javascripts/excanvas.js"></script>
@@ -21,34 +21,86 @@
 		<table width="100%">
 			<tr>
 				<td width="15%" valign="top" align="center">
-					<img src="images/javaleo-100.112.png" />
+					<div id="logo"></div>
+					<table id="summaryId" style="display:none;visibility:hidden;">
+						<tr>
+							<td id="sumMktNameId"></td>
+						</tr>
+						<tr>
+							<td>Market Cap</td>
+						</tr>
+						<tr>
+							<td id="sumMktCapId"></td>
+						</tr>
+						<tr>
+							<td>Currency Cap</td>
+						</tr>
+						<tr>
+							<td id="sumCurCapId"></td>
+						</tr>
+						<tr>
+							<td>Variation</td>
+						</tr>
+						<tr>
+							<td id="sumVarId"></td>
+						</tr>
+						<tr>
+							<td>Lowest Ask</td>
+						</tr>
+						<tr>
+							<td id="sumLowAskId"></td>
+						</tr>
+						<tr>
+							<td>Highest Bid</td>
+						</tr>
+						<tr>
+							<td id="sumHighBidId"></td>
+						</tr>
+						<tr>
+							<td>Spread</td>
+						</tr>
+						<tr>
+							<td id="sumSpreadId"></td>
+						</tr>
+					</table>
 				</td>
 				<td width="85%">
-					<select id="excId" name="exc">
-						<option value="">Exchange...</option>
-						<% 	for (var x = 0; x < excList.length; x++) { %>
-						<option value="<%= excList[x].name %>" <% if (excList[x].name == exchange) { %> selected <% } %> > <%= excList[x].name %></option>
-						<% 	} %>
-					</select>
-					<select id="mktId" name="mkt" disabled="true">
-						<option value="">Mercado...</option>
-						<% 	for (var y = 0; y < mktList.length; y++) { %>
-						<option value="<%= mktList[y].name %>" <% if (mktList[x].name == market) { %> selected <% } %> ><%= mktList[y].name %></option>
-						<% 	} %>
-					</select>
-					<select id="cndlId" name="cndl" disabled="true">
-						<option value="">Intervalo...</option>
-						<option value="MIN10">10 min</option>
-						<option value="MIN30">30 min</option>
-					</select>
-
-					<div id="chartId" style="width:100%;height:400px;"></div>	
+					<div>
+						<select id="excId" name="exc">
+							<option value="">Exchange...</option>
+							<% 	for (var x = 0; x < excList.length; x++) { %>
+							<option value="<%= excList[x].name %>" <% if (excList[x].name == exchange) { %> selected <% } %> > <%= excList[x].name %></option>
+							<% 	} %>
+						</select>
+						<select id="mktId" name="mkt" disabled="true">
+							<option value="">Mercado...</option>
+							<% 	for (var y = 0; y < mktList.length; y++) { %>
+							<option value="<%= mktList[y].name %>" <% if (mktList[x].name == market) { %> selected <% } %> ><%= mktList[y].name %></option>
+							<% 	} %>
+						</select>
+						<select id="cndlId" name="cndl" disabled="true">
+							<option value="">Intervalo...</option>
+							<option value="MIN10">10 min</option>
+							<option value="MIN30">30 min</option>
+						</select>
+						<div id="loadingId">
+							<img src="images/4-0.gif"></img>
+						</div>
+					</div>
+					
+					<div id="chartId"></div>	
 				</td>
 			</tr>
 
 		</table>
 
 	</form>
+	
+	<div id="wait" class="modal">
+		<div class="modal-content">
+			<p>Aguarde...</p>
+		</div>
+	</div>
 
 </body>
 </html>

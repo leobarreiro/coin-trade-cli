@@ -1,6 +1,81 @@
 body {
+	font-family: Ubuntu, "Trebuchet MS", Arial;
+	font-size: 12pt;
 }
 
 a {
 	color: #00B7FF;
+}
+
+table tr td {
+	text-align: left;
+	padding: 2px 0px 0px 0px;
+}
+
+table#summaryId {
+	margin: 12px 4px 4px 4px;
+	font-weight: bold;
+}
+
+div#logo {
+	margin: 4px;
+	width: 160px;
+	height: 60px;
+	background-color: magenta;
+	border: 1px solid blue;
+}
+
+#sumMktNameId {
+	font-size: 16pt;
+}
+
+#sumMktCapId, #sumCurCapId, #sumVarId, #sumLowAskId, #sumHighBidId,
+	#sumSpreadId {
+	padding: 1px 0px 1px 0px;
+	font-weight: normal;
+}
+
+#chartId {
+	width: 100%;
+	height: 400px;
+}
+
+.red {
+	color: red;
+}
+
+.blue {
+	color: blue;
+}
+
+.green {
+	color: green;
+}
+
+.modal {
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 1; /* Sit on top */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: rgb(0, 0, 0); /* Fallback color */
+	background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+	background-color: #fefefe;
+	margin: 15% auto; /* 15% from the top and centered */
+	padding: 20px;
+	border: 1px solid #888;
+	width: 260px; /* Could be more or less, depending on screen size */
+}
+
+div#loadingId {
+	display: inline-block;
+	visibility: hidden;
+	width: 40px;
 }
